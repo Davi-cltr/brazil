@@ -1,0 +1,143 @@
+@import '@fontsource-variable/anybody/standard.css';
+@import '@fontsource-variable/hanken-grotesk';
+@import 'tailwindcss';
+
+/* Paleta: mata, ipê-amarelo, azul de azulejo, urucum, cal e tinta */
+@theme {
+  --color-mata: #0e3b2c;
+  --color-mata-2: #155a41;
+  --color-folha: #3baa6b;
+  --color-ipe: #ffc93c;
+  --color-anil: #2347a6;
+  --color-anil-escuro: #13245a;
+  --color-urucum: #e4572e;
+  --color-roxo: #c77dff;
+  --color-cal: #f7f4ec;
+  --color-tinta: #0b1410;
+
+  --font-display: 'Anybody Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Hanken Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+
+  --ease-brasa: cubic-bezier(0.65, 0.05, 0, 1);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --animate-marquee: marquee var(--duration) linear infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-100% - var(--gap))); }
+}
+
+/* Cada seção declara um tema; o fundo da página faz a transição */
+html {
+  --bg: var(--color-mata);
+  --fg: var(--color-cal);
+  --accent: var(--color-ipe);
+}
+html[data-theme='mata'] { --bg: var(--color-mata); --fg: var(--color-cal); --accent: var(--color-ipe); }
+html[data-theme='ipe'] { --bg: var(--color-ipe); --fg: var(--color-tinta); --accent: var(--color-urucum); }
+html[data-theme='anil'] { --bg: var(--color-anil); --fg: var(--color-cal); --accent: var(--color-ipe); }
+html[data-theme='noite'] { --bg: var(--color-anil-escuro); --fg: var(--color-cal); --accent: var(--color-ipe); }
+html[data-theme='cal'] { --bg: var(--color-cal); --fg: var(--color-tinta); --accent: var(--color-urucum); }
+html[data-theme='tinta'] { --bg: var(--color-tinta); --fg: var(--color-cal); --accent: var(--color-ipe); }
+html[data-theme='urucum'] { --bg: var(--color-urucum); --fg: var(--color-tinta); --accent: var(--color-cal); }
+html[data-theme='gramado'] { --bg: #116a3e; --fg: var(--color-cal); --accent: var(--color-ipe); }
+
+@layer base {
+  html {
+    color-scheme: dark;
+    background: var(--bg);
+    color: var(--fg);
+    transition: background-color 0.9s var(--ease-brasa), color 0.9s var(--ease-brasa);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  .lenis.lenis-stopped { overflow: hidden; }
+  @media (pointer: fine) { html { overscroll-behavior: none; } }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    overflow-x: clip;
+  }
+  ::selection { background: var(--color-ipe); color: var(--color-tinta); }
+  :focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 4px;
+    border-radius: 6px;
+  }
+  button, a, [role='button'], label[for] { cursor: pointer; }
+  section[id] { scroll-margin-top: 5rem; }
+  h1, h2, h3 { text-wrap: balance; }
+}
+
+/* Cursor próprio: só em mouse */
+@media (hover: hover) and (pointer: fine) {
+  html.has-cursor, html.has-cursor * { cursor: none !important; }
+}
+
+.grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  opacity: 0.045;
+  background-size: 220px 220px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 0.9s steps(4) infinite;
+}
+@keyframes grain {
+  0% { background-position: 0 0; }
+  25% { background-position: -60px 40px; }
+  50% { background-position: 50px -70px; }
+  75% { background-position: -20px 80px; }
+  100% { background-position: 0 0; }
+}
+
+/* Texto que rola letra a letra no hover */
+.roll { display: inline-flex; overflow: hidden; line-height: 1.15; vertical-align: bottom; }
+.roll__char { display: inline-block; position: relative; white-space: pre; }
+.roll__char > span { display: block; transition: transform 0.6s var(--ease-brasa); transition-delay: calc(var(--i) * 14ms); }
+.roll__char > span + span { position: absolute; inset: 0; transform: translateY(105%); }
+.roll-host:hover .roll__char > span:first-child,
+.roll-host:focus-visible .roll__char > span:first-child { transform: translateY(-105%); }
+.roll-host:hover .roll__char > span + span,
+.roll-host:focus-visible .roll__char > span + span { transform: translateY(0); }
+
+.word-mask { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.1em; margin-bottom: -0.1em; }
+.word-mask > span { display: inline-block; will-change: transform; }
+
+/* Calçadão: ondas em preto e branco */
+.calcadao {
+  height: 64px;
+  background-color: var(--color-tinta);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='64' viewBox='0 0 160 64'%3E%3Cpath d='M0 20 Q20 0 40 20 T80 20 T120 20 T160 20 V44 Q140 64 120 44 T80 44 T40 44 T0 44 Z' fill='%23f7f4ec'/%3E%3C/svg%3E");
+  background-size: 160px 64px;
+  animation: ondas 6s linear infinite;
+}
+@keyframes ondas { to { background-position: 160px 0; } }
+
+.dialog-overlay[data-state='open'] { animation: fade-in 0.4s var(--ease-out-expo); }
+.dialog-overlay[data-state='closed'] { animation: fade-out 0.25s ease-in forwards; }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes fade-out { to { opacity: 0; } }
+
+.biome-sway { transform-box: fill-box; transform-origin: 50% 100%; animation: sway 3.6s ease-in-out infinite alternate; }
+.calor { animation: calor 2.4s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes calor { from { transform: scaleY(1) skewX(0deg); } to { transform: scaleY(1.012) skewX(0.6deg); } }
+.biome-sway--forte { animation-duration: 1.8s; }
+@keyframes sway { from { transform: skewX(-4deg); } to { transform: skewX(5deg); } }
+
+.marquee-band[data-paused='true'] .animate-marquee { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .grain, .calcadao { animation: none; }
+  .roll__char > span { transition: none; }
+  html { transition: none; }
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+}
